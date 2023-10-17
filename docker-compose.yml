@@ -1,0 +1,84 @@
+# This Docker Compose file is used to create PostgreSQL and pgAdmin containers.
+# Use this docker to developer projects with Python and PostgreSQL using REDIS, as you knwo, REDIS is a in-memory data structure store, used as a database, cache, 
+# and message broker also not working in Windows, so we need to use a docker to use it.
+# To use this configuration, navigate to the directory containing this file and execute:
+# docker-compose up -d
+
+version: "3.8"
+
+services:
+  db:
+    container_name: postgres_container
+    image: postgres:16.0
+    restart: always
+    env_file:
+      - postgres.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - D:\\docker_local_data\\postgres_data:/var/lib/postgresql/data
+    networks:
+      docker-compose-postgresal-pgadmin_mynetwork:
+        ipv4_address: 172.18.0.10  # Choose an available IP address within the subnet
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4:7.7
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    volumes:
+      - D:\\docker_local_data\\pgadmin_data:/var/lib/pgadmin
+    networks:
+      docker-compose-postgresal-pgadmin_mynetwork:
+        ipv4_address: 172.18.0.11  # Choose an available IP address within the subnet
+    depends_on:
+      - db
+
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - D:\\docker_local_data\\redis_data:/data
+    networks:
+      docker-compose-postgresal-pgadmin_mynetwork:
+        ipv4_address: 172.18.0.12  # Choose an available IP address within the subnet
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql_container
+    restart: always
+    env_file:
+      - mysql.env  # Create a separate env file for MySQL configuration
+    ports:
+      - "3306:3306"
+    volumes:
+      - D:\\docker_local_data\\mysql_data:/var/lib/mysql
+    networks:
+      docker-compose-postgresal-pgadmin_mynetwork:
+        ipv4_address: 172.18.0.13  # Choose an available IP address within the subnet
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_container
+    restart: always
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_ARBITRARY=1
+    ports:
+      - "8080:80"
+    networks:
+      docker-compose-postgresal-pgadmin_mynetwork:
+        ipv4_address: 172.18.0.14  # Choose an available IP address within the subnet
+
+networks:
+   docker-compose-postgresal-pgadmin_mynetwork:
+    external: true
+    name: docker-compose-postgresal-pgadmin_mynetwork

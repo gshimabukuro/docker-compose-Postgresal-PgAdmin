@@ -1,0 +1,78 @@
+# This Docker Compose file is used to create PostgreSQL and pgAdmin containers.
+# To use this configuration, navigate to the directory containing this file and execute:
+# docker-compose up -d
+
+version: "3.8"
+
+services:
+  db:
+    # Name for the PostgreSQL container
+    container_name: postgres_container
+
+    # Use the specified version of the PostgreSQL image
+    image: postgres:16.0  # Replace with your desired PostgreSQL version
+
+    # Ensure the container restarts automatically
+    restart: always
+
+    # Load environment variables from 'database.env' file
+    env_file:
+      - database.env
+
+    # Map host port 5432 to container port 5432
+    ports:
+      - "5432:5432"
+
+    # Mount the host directory to store PostgreSQL data
+    volumes:
+      - D:\\database\\postgresql\\postgres_data:/var/lib/postgresql/data
+
+    # Connect this container to the 'mynetwork' bridge network
+    networks:
+      - mynetwork
+
+  pgadmin:
+    # Name for the pgAdmin container
+    container_name: pgadmin4_container
+
+    # Use the specified version of the pgAdmin 4 image
+    image: dpage/pgadmin4:7.7  # Replace with your desired pgAdmin version
+
+    # Ensure the container restarts automatically
+    restart: always
+
+    # Set environment variables for pgAdmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+
+    # Map host port 5050 to container port 80
+    ports:
+      - "5050:80"
+
+    # Mount the host directory to store pgAdmin data
+    volumes:
+      - D:\\database\\postgresql\\pgadmin_data:/var/lib/pgadmin
+
+    # Connect this container to the 'mynetwork' bridge network
+    networks:
+      - mynetwork
+      
+  redis:
+    # Use the latest stable version of the Redis image
+    image: redis:latest
+    container_name: redis_container
+    restart: always
+    # Map host port 6379 to container port 6379
+    ports:
+      - "6379:6379"
+    # Mount a host directory for Redis data persistence
+    volumes:
+      - D:\\database\\redis_data:/data
+    networks:
+      - mynetwork      
+
+networks:
+  mynetwork:
+    # Use the bridge network driver for 'mynetwork'
+    driver: bridge
