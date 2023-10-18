@@ -74,9 +74,25 @@ services:
       - PMA_ARBITRARY=1
     ports:
       - "8080:80"
+    volumes:
+      - D:\\docker_local_data\\phpmyadmin_data:/var/lib/phpmyadmin
     networks:
       docker-compose-postgresal-pgadmin_mynetwork:
         ipv4_address: 172.18.0.14  # Choose an available IP address within the subnet
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    env_file:
+      - minio.env  # Corrected syntax with a hyphen
+    ports:
+      - "9000:9000"
+    volumes:
+      - D:\\docker_local_data\\mimo_data/data:/data
+    command: server /data
+    networks:
+      docker-compose-postgresal-pgadmin_mynetwork:
+        ipv4_address: 172.18.0.15  # Choose an available IP address within the subnet
 
 networks:
    docker-compose-postgresal-pgadmin_mynetwork:
